@@ -10,7 +10,8 @@
  *
  * @author daniel
  */
-require_once ("../../core/DBAbstractModel.php");
+//require_once ("../../core/DBAbstractModel.php");
+require_once ($_SERVER['DOCUMENT_ROOT']."/SCOREB/core/DBAbstractModel.php");
 
 /**
  * @author daniel

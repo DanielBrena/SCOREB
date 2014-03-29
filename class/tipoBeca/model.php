@@ -8,6 +8,7 @@
  * @author daniel
  */
 //require_once ("../core/DBAbstractModel.php");
+require_once ($_SERVER['DOCUMENT_ROOT']."/SCOREB/core/DBAbstractModel.php");
 class TipoBeca extends DBAbstractModel {
           
           protected $tip_id;
@@ -33,9 +34,9 @@ class TipoBeca extends DBAbstractModel {
                                         foreach ($this->rows[0] as $propiedad => $valor) {
                                                   $this->$propiedad = $valor;
                                         }
-                                        $this->mensaje = "Tipo beca  encontrado";
+                                        $this->mensaje = "Tipo de beca  encontrado";
                               }else{
-                                        $this->mensaje = "No se encontro tipo beca";
+                                        $this->mensaje = "No se encontro el tipo de beca";
                               }
                               
                     }else{
@@ -51,19 +52,23 @@ class TipoBeca extends DBAbstractModel {
                                                   $$campo = $valor;
                                         }
                                         
-                                         $fecha = date("Y-m-d h:m:s");
-
-                                        $this->query = "
+                                        $fecha = date("Y-m-d h:m:s");
+                                        if($tip_nombre != ''){
+                                          $this->query = "
                                                   INSERT INTO sb_tipo_beca
                                                   (tip_id,tip_nombre,tip_descripcion,tip_fechaCreacion)
                                                   VALUES
                                                   ('$tip_id','$tip_nombre','$tip_descripcion','$fecha')
-                                                  ";
-                                        $this->execute_single_query();
+                                                    ";
+                                          $this->execute_single_query();
+                                          
+                                          $this->mensaje = "Se creo un nuevo tipo de beca";
+                                        }else{
+                                          $this->mensaje = "Error, faltaron algunos campos que rellenar";
+                                        }
                                         
-                                        $this->mensaje = "Se creo tipo beca";
                               }else{
-                                        $this->mensaje = "Tipo beca existente";
+                                        $this->mensaje = "Tipo de beca existente";
                               }
                     }else{
                               $this->mensaje = "Error";
@@ -75,15 +80,21 @@ class TipoBeca extends DBAbstractModel {
                               foreach ($array_data as $campo => $valor) {
                                         $$campo = $valor;
                               }
-                              $this->query = "
+
+                              if($tip_nombre != ''){
+                                $this->query = "
                                         UPDATE sb_tipo_beca
                                         SET tip_nombre ='$tip_nombre',
-                                                 tip_descripcion = '$tip_descripcion'
-                                         
-                                                  WHERE tip_id = '$tip_id'
-                              ";
-                              $this->execute_single_query();
-                              $this->mensaje = "Se Actualizo tipo beca";
+                                                   tip_descripcion = '$tip_descripcion'
+                                           
+                                                    WHERE tip_id = '$tip_id'
+                                ";
+                                $this->execute_single_query();
+                                $this->mensaje = "Se actualizo el tipo de beca";
+                              }else{
+                                $this->mensaje = "Error, algunos campos no se rellenaron";
+                              }
+                              
                     }else{
                               $this->mensaje = "Error";
                     }
@@ -118,6 +129,16 @@ class TipoBeca extends DBAbstractModel {
                                  }else{
                                     return false;
                                  }
+          }
+
+          public function to_json(){
+            return json_encode(array(
+              'tip_id' => $this->tip_id,
+              'tip_nombre' => $this->tip_nombre,
+              'tip_descripcion' => $this->tip_descripcion,
+              'tip_fechaCreacion' => $this->tip_fechaCreacion
+
+              ));
           }
           
           public function getTip_id() {

@@ -13,8 +13,12 @@ class Sesion {
         //session_start();
         session_start();
         //$this->checarLogin();
+        $administrador = new Administrador();
+
         @$this->id=$_SESSION['adminID'];
-            
+        $administrador->get(intval($this->id));
+
+        @$this->permiso = $administrador->getAdm_permiso();
     }
 
     public function checarLogin() {
@@ -30,6 +34,7 @@ class Sesion {
            // $_SESSION['adminID'] = $administrador->getAdm_id();
             $_SESSION['adminID'] = $administrador->getAdm_id();
             $this->id = $administrador->getAdm_id();
+            $administrador->changeStatus(intval($this->id),1);
             $this->permiso = $administrador->getAdm_permiso();
             $_SESSION['login'] = true;
             return true;
@@ -58,7 +63,8 @@ class Sesion {
     }
     
     public function logout(){
-
+        $administrador = new Administrador();
+        $administrador->changeStatus(intval($this->id),0);
         $_SESSION['login'] = false;
         $this->id = null;
         $this->permiso = null;

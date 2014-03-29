@@ -1,16 +1,9 @@
 <?php 
-/**
-
-
-*/
-//require_once ("../../core/DBAbstractModel.php");
 require_once("../../class/sesion/Sesion.php");
-//require_once("../../class/administrador/model.php");
-//require_once("../../class/universidad/model.php");
 
 $sesion = new Sesion();
 
-if(!$sesion->checarLogin() && $sesion->getPermiso != 1){
+if(!$sesion->checarLogin() || @$sesion->getPermiso() == '2'){
     header("Location: ../login.php");
 }
 if($_GET){
@@ -27,10 +20,10 @@ if($_GET){
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Mosaddek">
+    <meta name="description" content="Sistema de Control de Becas">
+    <meta name="author" content="Daniel Brena Aquino">
     <meta name="keyword" content="Ulsa, La Salle Oaxaca, Universidad La Salle">
-    <link rel="shortcut icon" href="../img/favicon.png">
+    <link rel="shortcut icon"  type="image/png" href="../img/favicon.ico">
 
     <title>Administración</title>
 
@@ -66,9 +59,7 @@ if($_GET){
          
           <div class="top-nav ">
               <ul class="nav pull-right top-menu">
-                  <li>
-                      <input type="text" class="form-control search" placeholder="Search">
-                  </li>
+                  
                   <!-- user login dropdown start-->
                   <li class="dropdown">
                       <a data-toggle="dropdown" class="dropdown-toggle" href="#">
@@ -92,7 +83,9 @@ if($_GET){
                       </a>
                       <ul class="dropdown-menu extended logout">
                           <div class="log-arrow-up"></div>
-                          
+                          <li><a href=""><i class=""></i></a></li>
+                          <li><a href="index"><i class="icon-cog"></i> Configuración</a></li>
+                          <li><a href=""><i class=""></i></a></li>
                           <li><a href="index.php?q=logout"><i class="icon-key"></i> Log Out</a></li>
                       </ul>
                   </li>
@@ -105,6 +98,7 @@ if($_GET){
       <aside>
           <div id="sidebar"  class="nav-collapse ">
               <!-- sidebar menu start-->
+              <input type="hidden" id="-a" value="<?php echo $administrador->getAdm_nombre(); ?>">
               <ul class="sidebar-menu" id="nav-accordion">
                   <li>
                       <a href="index.php">
@@ -120,10 +114,15 @@ if($_GET){
                       </a>
                       <ul class="sub">
                          
-                          <li id="ciclo-escolares"><a  href="javascript:;">Ciclos escolares</a></li>
-                          <li id="programas"><a  href="javascript:;">Programas</a></li>
-                          <li id="tipo-becas"><a  href="javascript:;">Tipos de becas</a></li>
+                          <li id="ciclo-escolares"><a  href="ciclosescolares">Ciclos escolares</a></li>
+                          <li id="programas"><a  href="programas">Programas</a></li>
+                          <li id="tipo-becas"><a  href="tiposbecas">Tipos de becas</a></li>
                           <li id="administradores"><a  href="administradores">Administradores</a></li>
+                          <li id="otorgarbeca"><a  href="otorgarbecas">Otorgar becas</a></li>
+                          <li id="matricula"><a  href="matricula">Matricula</a></li>
+                          <li id="alumnos"><a  href="alumnos">Alumnos</a></li>
+                          <li id="cambiarPorcentajeAcordado"><a  href="cambiarPorcentajeAcordado">Porcentajes acordados</a></li>
+                          <li id="infobecanueva"><a  href="infobecanueva">Información becas nuevas</a></li>
                       </ul>
                   </li>
 
@@ -152,31 +151,32 @@ if($_GET){
                               <div class="form">
                                   <form class="cmxform form-horizontal tasi-form" id="" >
                                       <div class="form-group ">
-                                          <label for="firstname" class="control-label col-lg-2">Nombre</label>
+                                         <input class=" form-control" id='adm-id-1' type="hidden" />
+                                          <label  class="control-label col-lg-2">Nombre</label>
                                           <div class="col-lg-10">
                                               <input class=" form-control" id='adm-nombre-1' type="text" />
                                           </div>
                                       </div>
                                       <div class="form-group ">
-                                          <label for="lastname" class="control-label col-lg-2">Apellido paterno</label>
+                                          <label  class="control-label col-lg-2">Apellido paterno</label>
                                           <div class="col-lg-10">
                                               <input class=" form-control" id="adm-apellido_paterno-1"  type="text" />
                                           </div>
                                       </div>
                                       <div class="form-group ">
-                                          <label for="username" class="control-label col-lg-2">Apellido materno</label>
+                                          <label class="control-label col-lg-2">Apellido materno</label>
                                           <div class="col-lg-10">
                                               <input class="form-control " id="adm-apellido_materno-1" type="text" />
                                           </div>
                                       </div>
                                       <div class="form-group ">
-                                          <label for="email" class="control-label col-lg-2">Correo electronico</label>
+                                          <label class="control-label col-lg-2">Correo electronico</label>
                                           <div class="col-lg-10">
                                               <input class="form-control " id="adm-correo-1"  type="email" />
                                           </div>
                                       </div>
                                       <div class="form-group ">
-                                          <label for="password" class="control-label col-lg-2">Usuario</label>
+                                          <label class="control-label col-lg-2">Usuario</label>
                                           <div class="col-lg-10">
                                               <input class="form-control " id="adm-usuario-1" type="text" />
                                           </div>
@@ -201,7 +201,10 @@ if($_GET){
 
                                       <div class="form-group">
                                           <div class="col-lg-offset-2 col-lg-10">
+
                                               <button class="btn btn-danger" id="adm-enviar-1" type="button">Enviar</button>
+                                              <button class="btn btn-default" style="display:none;" id="adm-cancelar-1" type="button">Cancelar</button>
+                                              <button class="btn btn-primary" style="display:none;" id="adm-actualizar-1" type="button">Actualizar</button>
                                               
                                           </div>
                                       </div>
@@ -229,10 +232,10 @@ if($_GET){
                                   <th><i class="icon-envelope-alt"></i> Correo electronico</th>
                                   <th><i></i> </th>
                                   <th><i class=" icon-edit"></i> Editar</th>
-                                  <th></th>
+                                  
                               </tr>
                               </thead>
-                              <tbody id="tabla_administradores">
+                              <tbody id="adm-table-administradores">
                                <?php 
 
                                 /*$administradores = new Administrador();
@@ -299,7 +302,7 @@ if($_GET){
     <!--griter-verificar-->
     <script type="text/javascript" src="../assets/gritter/js/jquery.gritter.js"></script>
     <!--this page-->
-    <script type="text/javascript" src="js/app-administrador.js"></script>
+    <script type="text/javascript" src="js/app-administradores.js"></script>
 
   </body>
 </html>

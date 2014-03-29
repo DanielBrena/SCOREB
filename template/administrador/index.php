@@ -6,11 +6,15 @@
 //require_once ("../../core/DBAbstractModel.php");
 require_once("../../class/sesion/Sesion.php");
 //require_once("../../class/administrador/model.php");
-require_once("../../class/universidad/model.php");
-
+//require_once("../../class/universidad/model.php");
+require_once("../../class/programa/model.php");
+require_once("../../class/administrador/model.php");
+require_once("../../class/ciclo/model.php");
+require_once("../../class/tipoBeca/model.php");
+require_once("../../class/configuracion/model.php");
 $sesion = new Sesion();
-
-if(!$sesion->checarLogin() && $sesion->getPermiso != 1){
+  //var_dump($sesion->getPermiso());
+if(!$sesion->checarLogin() || @$sesion->getPermiso() == "2"){
     header("Location: ../login.php");
 }
 if($_GET){
@@ -27,10 +31,10 @@ if($_GET){
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Mosaddek">
+    <meta name="description" content="Sistema de Control de Becas">
+    <meta name="author" content="Daniel Brena Aquino">
     <meta name="keyword" content="Ulsa, La Salle Oaxaca, Universidad La Salle">
-    <link rel="shortcut icon" href="../img/favicon.png">
+    <link rel="shortcut icon"  type="image/png" href="../img/favicon.ico">
 
     <title>Administración</title>
 
@@ -59,14 +63,12 @@ if($_GET){
               <div data-original-title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips"></div>
           </div>
           <!--logo start-->
-          <a href="index.html" class="logo" >SCO<span>REB</span></a>
+          <a href="../index" class="logo" >SCO<span>REB</span></a>
           <!--logo end-->
          
           <div class="top-nav ">
               <ul class="nav pull-right top-menu">
-                  <li>
-                      <input type="text" class="form-control search" placeholder="Search">
-                  </li>
+                 
                   <!-- user login dropdown start-->
                   <li class="dropdown">
                       <a data-toggle="dropdown" class="dropdown-toggle" href="#">
@@ -118,10 +120,15 @@ if($_GET){
                       </a>
                       <ul class="sub">
                          
-                          <li id="ciclo-escolares"><a  href="javascript:;">Ciclos escolares</a></li>
-                          <li id="programas"><a  href="javascript:;">Programas</a></li>
-                          <li id="tipo-becas"><a  href="javascript:;">Tipos de becas</a></li>
+                          <li id="ciclo-escolares"><a  href="ciclosescolares">Ciclos escolares</a></li>
+                          <li id="programas"><a  href="programas">Programas</a></li>
+                          <li id="tipo-becas"><a  href="tipobecas">Tipos de becas</a></li>
                           <li id="administradores"><a  href="administradores">Administradores</a></li>
+                          <li id="otorgarbeca"><a  href="otorgarbecas">Otorgar becas</a></li>
+                          <li id="matricula"><a  href="matricula">Matricula</a></li>
+                          <li id="alumnos"><a  href="alumnos">Alumnos</a></li>
+                          <li id="cambiarPorcentajeAcordado"><a  href="cambiarPorcentajeAcordado">Porcentajes acordados</a></li>
+                          <li id="infobecanueva"><a  href="infobecanueva">Información becas nuevas</a></li>
                       </ul>
                   </li>
 
@@ -136,10 +143,161 @@ if($_GET){
       <section id="main-content">
           <section class="wrapper site-min-height">
               <!-- page start-->
-              
+              <div class="row state-overview">
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <div class="symbol terques">
+                              <i class="icon-user"></i>
+                          </div>
+                          <div class="value">
+                              <h1 class="count">
+                                   <?php 
+                                  $admin = new Administrador();
+                                  $row_a = $admin->mostrar();
+                                 
+                                  echo count($row_a);
+                                   ?>
+                              </h1>
+                              <p>Administradores</p>
+                          </div>
+                      </section>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <div class="symbol red">
+                              <i class=" icon-calendar-empty"></i>
+                          </div>
+                          <div class="value">
+                              <h1 class=" count2">
+                                   <?php 
+                                  $ciclo = new CicloEscolar();
+                                  $row_c = $ciclo->mostrar();
+                                 
+                                  echo count($row_c);
+                                   ?>
+                              </h1>
+                              <p>Ciclos escolares</p>
+                          </div>
+                      </section>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <div class="symbol yellow">
+                              <i class="icon-book"></i>
+                          </div>
+                          <div class="value">
+                              <h1 class=" count3">
+                                  <?php 
+                                  $programa = new Programa();
+                                  $row_p = $programa->mostrar();
+                                 
+                                  echo count($row_p);
+                                   ?>
+                              </h1>
+                              <p>Programas</p>
+                          </div>
+                      </section>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <div class="symbol blue">
+                              <i class=" icon-unchecked (alias)"></i>
+                          </div>
+                          <div class="value">
+                              <h1 class=" count4">
+                                   <?php 
+                                  $tipobeca = new TipoBeca();
+                                  $row_tb = $tipobeca->mostrar();
+                                 
+                                  echo count($row_tb);
+                                   ?>
+                              </h1>
+                              <p>Tipos de becas</p>
+                          </div>
+                      </section>
+                  </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-12">
+                  <section class="panel">
+                <?php 
+
+                /**
+
+                */
+                $admin_info = new Administrador();
+                $admin_info->get(intval($sesion->getID()));
+                 ?>
+                    <div class="bio-graph-heading">
+                             Universidad La Salle Oaxaca.
+                      </div>
+                      <div class="panel-body bio-graph-info">
+                              <h1>Administrador</h1>
+                              <div class="row">
+                                  <div class="bio-row">
+                                      <p><span>Nombre </span>: <?php echo " ".$admin_info->getAdm_nombre(); ?></p>
+                                  </div>
+                                  <div class="bio-row">
+                                      <p><span>Apellido Paterno </span>: <?php echo " ".$admin_info->getAdm_apellidoPaterno(); ?></p>
+                                  </div>
+                                  <div class="bio-row">
+                                      <p><span>Usuario </span>: <?php echo " ".$admin_info->getAdm_usuario(); ?></p>
+                                  </div>
+                                  <div class="bio-row">
+                                      <p><span>Correo</span>:<?php echo " ".$admin_info->getAdm_correo(); ?></p>
+                                  </div>
+                                  
+                              </div>
+                      </div>
+                  </section>
               <!-- page end-->
+
+              <div class="row">
+                  <div class="col-lg-12">
+                      <section class="panel">
+                          <header class="panel-heading">
+                              Configuracion porcentaje para la Matricula esperada.
+                          </header>
+                          <div class="panel-body">
+                              <form class="form-inline" role="form">
+                                  <div class="form-group">
+                                      
+                                      
+                                  </div>
+                                  <div class="form-group">
+                                      <div class="col-lg-5">
+                                            <div class="input-group m-bot15">
+                                              <?php 
+                                              /**
+                                              
+                                              */
+                                              $configuracion = new Configuracion();
+                                              $configuracion->get(intval(2));
+                                              $valor = $configuracion->getCon_valorConfiguracion();
+                                              $id = $configuracion->getCon_id();
+                                               ?>
+                                              <input  type="text" <?php echo 'value="'.$valor.'" data-id="'.$id.'"'; ?> class="form-control" id="porcentaje-matricula" placeholder="0">
+                                              <span class="input-group-addon">%</span>
+                                            </div>
+                                     
+                                     </div>
+                                  
+                                  <button type="button" id="enviar-porcentaje" class="btn btn-success">Actualizar</button>
+                              </form>
+
+                          </div>
+                      </section>
+
+                  </div>
+              </div>
           </section>
       </section>
+                </div>
+              </div>
+              
+
+              
       <!--main content end-->
       <!--footer start-->
       <footer class="site-footer">
@@ -166,7 +324,8 @@ if($_GET){
     <script src="../js/common-scripts.js"></script>
 
     <!--this page-->
-    <script type="text/javascript" src="js/app-administrador.js"></script>
+    
+    <script type="text/javascript" src="js/app-index.js"></script>
   
   </body>
 </html>

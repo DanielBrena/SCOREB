@@ -119,7 +119,7 @@ if($_GET){
                          
                           <li><a  href="cicloEscolar">Ciclo escolar</a></li>
                           <li><a  href="programas">Programas</a></li>
-                          <li><a  href="tipoBecas">Tipos de becas</a></li>
+                          <li><a  href="tipobecas">Tipos de becas</a></li>
                           <li><a  href="administradores">Administradores</a></li>
                       </ul>
                   </li>

@@ -47,6 +47,7 @@ class Administrador extends DBAbstractModel {
                                         foreach ($this->rows[0] as $propiedad => $valor) {
                                                   $this->$propiedad = $valor;
                                         }
+                                        //$this->adm_clave = base64_decode($this->adm_clave);
                                         
                                         $this->mensaje = "Se encontro administrador";
                                         
@@ -68,30 +69,39 @@ class Administrador extends DBAbstractModel {
                                  foreach ($array_data as $campo => $valor) {
                                            $$campo = $valor;
                                  }
-                                 $this->query = "SELECT * FROM sb_administrador
+                                 if($adm_nombre != ''  && $adm_apellidoPaterno != '' &&  ($adm_correo != '' && filter_var($adm_correo, FILTER_VALIDATE_EMAIL)) && $adm_usuario != '' && $adm_clave != ''){
+                                    $adm_clave = base64_encode($adm_clave);
+
+                                    $this->query = "SELECT * FROM sb_administrador
                                            WHERE adm_nombre = '$adm_nombre' AND adm_apellidoPaterno = '$adm_apellidoPaterno'
                                                      OR adm_correo = '$adm_correo' OR adm_usuario = '$adm_usuario'                                               
-                                        ";
-                                 $this->get_results_from_query();
-                                 
-                                 if(count($this->rows) == 1){
-                                           $this->mensaje = "Administrador existente";
+                                            ";
+                                     $this->get_results_from_query();
+                                     
+                                     if(count($this->rows) == 1){
+                                               $this->mensaje = "Administrador existente";
+                                     }else{
+                                               unset($this->rows);
+                                               
+                                               $fecha = date("Y-m-d h:m:s");
+                                               
+                                               $this->query = "
+                                                  INSERT INTO sb_administrador
+                                                  (adm_id,adm_nombre,adm_apellidoPaterno,adm_apellidoMaterno,
+                                                      adm_correo,adm_usuario,adm_clave,adm_permiso,adm_fechaCreacion,adm_estado)
+                                                  VALUES
+                                                  ('$adm_id','$adm_nombre','$adm_apellidoPaterno','$adm_apellidoMaterno',
+                                                      '$adm_correo','$adm_usuario','$adm_clave','$adm_permiso','$fecha','0')
+                                               ";
+                                               $this->execute_single_query();
+                                               $this->mensaje = "Se ha creado un administrador";
+                                     }
+
+
                                  }else{
-                                           unset($this->rows);
-                                           
-                                           $fecha = date("Y-m-d h:m:s");
-                                           
-                                           $this->query = "
-                                              INSERT INTO sb_administrador
-                                              (adm_id,adm_nombre,adm_apellidoPaterno,adm_apellidoMaterno,
-                                                  adm_correo,adm_usuario,adm_clave,adm_permiso,adm_fechaCreacion,adm_estado)
-                                              VALUES
-                                              ('$adm_id','$adm_nombre','$adm_apellidoPaterno','$adm_apellidoMaterno',
-                                                  '$adm_correo','$adm_usuario','$adm_clave','$adm_permiso','$fecha','0')
-                                           ";
-                                           $this->execute_single_query();
-                                           $this->mensaje = "Se ha creado un administrador";
+                                    $this->mensaje = "Error, faltan algunos campos que rellenar";
                                  }
+                                 
                               
                     }else{
                               $this->mensaje = "Error!";
@@ -103,22 +113,28 @@ class Administrador extends DBAbstractModel {
                               foreach ($array_data as $campo => $valor) {
                                         $$campo = $valor;
                               }
-                              $this->query = "
-                                        UPDATE sb_administrador
-                                        SET
-                                        adm_nombre = '$adm_nombre',
-                                                  adm_apellidoPaterno = '$adm_apellidoPaterno',
-                                                            adm_apellidoMaterno = '$adm_apellidoMaterno',
-                                                                      adm_correo = '$adm_correo',
-                                                                                adm_usuario = '$adm_usuario',
-                                                                                          adm_clave = '$adm_clave',
-                                                                                                    adm_permiso = '$adm_permiso'
-                                                                                                              
-                                                                                                    WHERE adm_id ='$adm_id'
-                                                                                
-                                ";
-                              $this->execute_single_query();
-                              $this->mensaje = "Se actualizo administrador";
+                              if($adm_nombre != ''  && $adm_apellidoPaterno != '' &&  ($adm_correo != '' && filter_var($adm_correo, FILTER_VALIDATE_EMAIL)) && $adm_usuario != '' && $adm_clave != ''){
+                                  $adm_clave = base64_encode($adm_clave);
+                                  $this->query = "
+                                          UPDATE sb_administrador
+                                          SET
+                                          adm_nombre = '$adm_nombre',
+                                                    adm_apellidoPaterno = '$adm_apellidoPaterno',
+                                                              adm_apellidoMaterno = '$adm_apellidoMaterno',
+                                                                        adm_correo = '$adm_correo',
+                                                                                  adm_usuario = '$adm_usuario',
+                                                                                            adm_clave = '$adm_clave',
+                                                                                                      adm_permiso = '$adm_permiso'
+                                                                                                                
+                                                                                                      WHERE adm_id ='$adm_id'
+                                                                                  
+                                  ";
+                                $this->execute_single_query();
+                                $this->mensaje = "Se actualizo administrador";
+                              }else{
+                                $this->mensaje =  "Error, faltaron algunos campos obligatorios que rellenar.";
+                              }
+                              
                     }else{
                               $this->mensaje = "Error";
                     }
@@ -140,6 +156,7 @@ class Administrador extends DBAbstractModel {
 
           public function login($admin = '',$clave = ''){
             if($admin != '' && $clave != ''){
+              $clave = base64_encode($clave);
               $this->query = "SELECT * FROM sb_administrador
               WHERE adm_correo = '$admin' OR adm_usuario = '$admin' AND adm_clave = '$clave'";
               $this->get_results_from_query();
@@ -180,6 +197,40 @@ class Administrador extends DBAbstractModel {
             $this->query = "SELECT * FROM sb_administrador";
             $this->get_results_from_query();
             return $this->rows;
+          }
+
+          public function changeStatus($id = '', $opcion = ''){
+            
+              if(is_int($id)){
+                if($opcion == 1){
+                  $this->query = "UPDATE sb_administrador SET adm_estado = '1' WHERE adm_id = '$id'";
+                  $this->execute_single_query();
+                  $this->mensaje = "Administrador activo";
+                }else{
+                  $this->query = "UPDATE sb_administrador SET adm_estado = '0' WHERE adm_id = '$id'";
+                  $this->execute_single_query();
+                  $this->mensaje = "Administrador activo";
+                }
+              }else{
+                $this->mensaje = "Error";
+              }
+            
+          }
+
+          public function to_json(){
+            return json_encode(array(
+              'adm_id' => $this->adm_id,
+              'adm_nombre' => $this->adm_nombre,
+              'adm_apellidoPaterno' => $this->adm_apellidoPaterno,
+              'adm_apellidoMaterno' => $this->adm_apellidoMaterno,
+              'adm_correo' => $this->adm_correo,
+              'adm_usuario' => $this->adm_usuario,
+              'adm_clave' =>  base64_decode($this->adm_clave),
+              'adm_permiso' => $this->adm_permiso,
+              'adm_fechaCreacion' => $this->adm_fechaCreacion,
+              'adm_estado' => $this->adm_estado
+
+              ));
           }
           
           public function getAdm_id() {

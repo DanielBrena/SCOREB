@@ -1,46 +1,40 @@
-<?php
-//require_once ("../core/DBAbstractModel.php");
-//require_once("../class/sesion/Sesion.php");
-//require_once("../class/administrador/model.php");
-include("../class/sesion/Sesion.php");
-//include("../class/administrador/model.php");
+<?php 
+
+require_once("../class/sesion/Sesion.php");
+require_once("../class/alumno/model.php");
+require_once("../class/vistas/model.php");
+require_once("../class/programa/model.php");
 $sesion = new Sesion();
 
-
-/*if(empty($sesion->checarLogin())){
-    header("Location: login.php");
-}
-*/
 if(!$sesion->checarLogin()){
-    header("Location: login");
+    header("Location: login.php");
 }
 if($_GET){
    if($_GET['q'] == 'logout'){
     $sesion->logout();
-    header("Location: login");
+    header("Location: login.php");
    }
 }
 
-?>
+
+ ?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Mosaddek">
-    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
-    <link rel="shortcut icon" href="img/favicon.png">
+    <meta name="description" content="Sistema de Control de Becas">
+    <meta name="author" content="Daniel Brena Aquino">
+    <meta name="keyword" content="Ulsa, La Salle Oaxaca, Universidad La Salle">
+    <link rel="shortcut icon"  type="image/png" href="img/favicon.ico">
 
-    <title>Admin</title>
+    <title>Inicio</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-reset.css" rel="stylesheet">
     <!--external css-->
     <link href="assets/font-awesome/css/font-awesome.css" rel="stylesheet" />
-    <link href="assets/jquery-easy-pie-chart/jquery.easy-pie-chart.css" rel="stylesheet" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="css/owl.carousel.css" type="text/css">
     <!-- Custom styles for this template -->
     <link href="css/style.css" rel="stylesheet">
     <link href="css/style-responsive.css" rel="stylesheet" />
@@ -52,123 +46,197 @@ if($_GET){
     <![endif]-->
   </head>
 
-  <body>
+  <body data-page="index">
 
-  <section id="container" >
+  <section  id="container" class="">
       <!--header start-->
       <header class="header white-bg">
-            <div class="sidebar-toggle-box">
-                <div data-original-title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips"></div>
-            </div>
-            <!--logo start-->
-            <a href="index.html" class="logo">SCO<span>REB</span></a>
-            <!--logo end-->
-            <div class="nav notify-row" id="top_menu">
-                <!--  notification start -->
-                
-                <!--  notification end -->
-            </div>
-            <div class="top-nav ">
-                <!--search & user info start-->
-                <ul class="nav pull-right top-menu">
-                    <li>
-                        <input type="text" class="form-control search" placeholder="Search">
-                    </li>
-                    <!-- user login dropdown start-->
-                    <?php 
-                    
-                    $administrador = new Administrador();
-    
+          <div class="sidebar-toggle-box">
+              <div data-original-title="Toggle Navigation" data-placement="right" class="icon-reorder tooltips"></div>
+          </div>
+          <!--logo start-->
+          <a href="index" class="logo" >SCO<span>REB</span></a>
+          <!--logo end-->
+         
+          <div class="top-nav ">
+              <ul class="nav pull-right top-menu">
+                 
+                  <!-- user login dropdown start-->
+                  <li class="dropdown">
+                      <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                          
+                          <span class="username">
 
-                    $administrador->get(intval($sesion->getId()));
-                     ?>
-                    <li class="dropdown">
-                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <img alt="" src="">
-                            <span class="username"><?php echo $administrador->getAdm_nombre()." " .$administrador->getAdm_apellidoPaterno(); ?></span>
-                            <b class="caret"></b>
-                        </a>
-                        <ul class="dropdown-menu extended logout">
-                            <div class="log-arrow-up"></div>
-                           <!-- <li><a href="#"><i class=" icon-suitcase"></i>Profile</a></li>-->
-                            <li><a href=""><i class=""></i> </a></li>
-                             <li><a href="administrador/"><i class="icon-cog"></i> Configuración</a></li>
-                             <li><a href=""><i class=""></i></a></li>
-                           <!-- <li><a href="#"><i class="icon-bell-alt"></i> Notification</a></li>-->
-                            <li><a href="index.php?q=logout"><i class="icon-key"></i>Cerrar sesion</a></li>
-                        </ul>
-                    </li>
-                    <!-- user login dropdown end -->
-                </ul>
-                <!--search & user info end-->
-            </div>
-        </header>
+                          <?php 
+                          /**
+                            Nombre de la sesion
+
+                            */
+
+                          $administrador = new Administrador();
+                          $administrador->get(intval($sesion->getId()));
+                          echo $administrador->getAdm_nombre()." ".$administrador->getAdm_apellidoPaterno();
+
+                           ?>
+
+                          </span>
+                          <b class="caret"></b>
+                      </a>
+                      <ul class="dropdown-menu extended logout">
+                          <div class="log-arrow-up"></div>
+                          <li><a href=""><i class=""></i></a></li>
+                          <?php 
+                          if(@$sesion->getPermiso() != '2'){
+                            echo '<li><a href="administrador/"><i class="icon-cog"></i>Configuración</a></li>';
+                          }
+                           ?>
+                          
+                          <li><a href=""><i class=""></i></a></li>
+                          <li><a href="index.php?q=logout"><i class="icon-key"></i>Cerrar sesión</a></li>
+                      </ul>
+                  </li>
+                  <!-- user login dropdown end -->
+              </ul>
+          </div>
+      </header>
       <!--header end-->
       <!--sidebar start-->
       <aside>
           <div id="sidebar"  class="nav-collapse ">
-           
+              <!-- sidebar menu start-->
+              <ul class="sidebar-menu" id="nav-accordion">
+                  <li>
+                      <a href="index.php">
+                          <i class="icon-dashboard"></i>
+                          <span>Inicio</span>
+                      </a>
+                  </li>
+
+                  
+
+                  
+
+              </ul>
+              <!-- sidebar menu end-->
           </div>
       </aside>
       <!--sidebar end-->
       <!--main content start-->
       <section id="main-content">
-          <section class="wrapper">
-             
+          <section class="wrapper site-min-height">
+              <!-- page start-->
+              <div class="row state-overview">
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <a href="becanueva">
+                            <div class="symbol terques">
+                                <i class="icon-user"></i>
+                            </div>
+                          </a>
+                          <div class="value">
+                              <h1 class="count">
+                                  <?php 
+                                  $becanueva = new VistaBecaAlumno();
+                                 $row = $becanueva->mostrar_param('Nueva');
+                                 echo count($row);
+                                  ?>
+                              </h1>
+                              <p>Becas nuevas</p>
+                          </div>
+                      </section>
+                  </div>
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <a href="alumnos">
+                            <div class="symbol red">
+                                <i class="icon-group"></i>
+                            </div>
+                          </a>
+                          <div class="value">
+                              <h1 class=" count2">
+                                  <?php 
+                                  $alumnos = new Alumno();
+                                  $row2 = $alumnos->mostrar();
+                                 
+                                  echo count($row2);
+                                   ?>
+                              </h1>
+                              <p>Alumnos</p>
+                          </div>
+                      </section>
+                  </div>
+
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          
+                            <div class="symbol yellow">
+                                <i class="icon-user"></i>
+                            </div>
+                          
+                          <div class="value">
+                              <h1 class="count">
+                                  <?php 
+                                  $becarenovacion = new VistaBecaAlumno();
+                                  $row = $becarenovacion->mostrar_param('Renovacion');
+                                  echo count($row);
+                                  ?>
+                              </h1>
+                              <p>Renovaciones</p>
+                          </div>
+                      </section>
+                  </div>
+
+                  <div class="col-lg-3 col-sm-6">
+                      <section class="panel">
+                          <div class="symbol blue">
+                              <i class="icon-book"></i>
+                          </div>
+                          <div class="value">
+                              <h1 class=" count3">
+                                  <?php 
+                                  $programa = new Programa();
+                                 $row_p = $programa->mostrar();
+                                 
+                                 echo count($row_p);
+                                   ?>
+                              </h1>
+                              <p>Programas</p>
+                          </div>
+                      </section>
+                  </div>
+                  
+                 
+              </div>
+              <!-- page end-->
           </section>
       </section>
       <!--main content end-->
       <!--footer start-->
-      
-      
+      <footer class="site-footer">
+          <div class="text-center">
+              
+            Desarrollado por Daniel Brena Aquino y Tamara Pérez Vázquez
+              <a href="#" class="go-top">
+                  <i class="icon-angle-up"></i>
+              </a>
+          </div>
+      </footer>
       <!--footer end-->
   </section>
 
     <!-- js placed at the end of the document so the pages load faster -->
     <script src="js/jquery.js"></script>
-    <script src="js/jquery-1.8.3.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script class="include" type="text/javascript" src="js/jquery.dcjqaccordion.2.7.js"></script>
     <script src="js/jquery.scrollTo.min.js"></script>
     <script src="js/jquery.nicescroll.js" type="text/javascript"></script>
-    <script src="js/jquery.sparkline.js" type="text/javascript"></script>
-    <script src="assets/jquery-easy-pie-chart/jquery.easy-pie-chart.js"></script>
-    <script src="js/owl.carousel.js" ></script>
-    <script src="js/jquery.customSelect.min.js" ></script>
     <script src="js/respond.min.js" ></script>
-
-    <script class="include" type="text/javascript" src="js/jquery.dcjqaccordion.2.7.js"></script>
 
     <!--common script for all pages-->
     <script src="js/common-scripts.js"></script>
 
-    <!--script for this page-->
-    <script src="js/sparkline-chart.js"></script>
-    <script src="js/easy-pie-chart.js"></script>
-    <script src="js/count.js"></script>
-
-  <script>
-
-      //owl carousel
-
-      $(document).ready(function() {
-          $("#owl-demo").owlCarousel({
-              navigation : true,
-              slideSpeed : 300,
-              paginationSpeed : 400,
-              singleItem : true,
-			  autoPlay:true
-
-          });
-      });
-
-      //custom select box
-
-      $(function(){
-          $('select.styled').customSelect();
-      });
-
-  </script>
-
+    <!--this page-->
+   
   </body>
 </html>
+

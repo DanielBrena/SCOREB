@@ -7,6 +7,8 @@
  * @author daniel
  */
 //require_once ("../core/DBAbstractModel.php");
+require_once ($_SERVER['DOCUMENT_ROOT']."/SCOREB/core/DBAbstractModel.php");
+
 class Programa extends DBAbstractModel {
           protected $pro_id;
           private $pro_nombre;
@@ -51,17 +53,22 @@ class Programa extends DBAbstractModel {
                                                   $$campo = $valor;
                                         }
                                         
-                                         $fecha = date("Y-m-d h:m:s");
+                                        if($pro_nombre != '' ){
+                                          $fecha = date("Y-m-d h:m:s");
 
-                                        $this->query = "
-                                                  INSERT INTO sb_programa
-                                                  (pro_id,pro_nombre,pro_descripcion,pro_fechaCreacion)
-                                                  VALUES
-                                                  ('$pro_id','$pro_nombre','$pro_descripcion','$fecha')
-                                                  ";
-                                        $this->execute_single_query();
+                                          $this->query = "
+                                                    INSERT INTO sb_programa
+                                                    (pro_id,pro_nombre,pro_descripcion,pro_fechaCreacion)
+                                                    VALUES
+                                                    ('$pro_id','$pro_nombre','$pro_descripcion','$fecha')
+                                                    ";
+                                          $this->execute_single_query();
+                                          
+                                          $this->mensaje = "Se creo programa";
+                                        }else{
+                                          $this->mensaje = "Falataron rellenar algunos campos";
+                                        }
                                         
-                                        $this->mensaje = "Se creo programa";
                               }else{
                                         $this->mensaje = "Programa existente";
                               }
@@ -75,15 +82,20 @@ class Programa extends DBAbstractModel {
                               foreach ($array_data as $campo => $valor) {
                                         $$campo = $valor;
                               }
-                              $this->query = "
+                              if($pro_nombre != ''){
+                                $this->query = "
                                         UPDATE sb_programa
                                         SET pro_nombre ='$pro_nombre',
                                                   pro_descripcion = '$pro_descripcion'
                                          
                                                   WHERE pro_id = '$pro_id'
-                              ";
-                              $this->execute_single_query();
-                              $this->mensaje = "Se Actualizo programa";
+                                ";
+                                $this->execute_single_query();
+                                $this->mensaje = "Se Actualizo programa";
+                              }else{
+                                $this->mensaje = "Faltaron algunos campos que rellenar";
+                              }
+                              
                     }else{
                               $this->mensaje = "Error";
                     }
@@ -94,7 +106,7 @@ class Programa extends DBAbstractModel {
                               $this->query = "DELETE FROM sb_programa
                                         WHERE pro_id ='$id' ";
                               $this->execute_single_query();
-                              $this->mensaje = "Se elimino programa";
+                              $this->mensaje = "Se elimino el programa";
                     }else{
                               $this->mensaje = "Error";
                     }
@@ -119,7 +131,17 @@ class Programa extends DBAbstractModel {
                                     return false;
                                  }
           }
-          
+
+          public function to_json(){
+            return json_encode(array(
+              'pro_id' => $this->pro_id,
+              'pro_nombre' => $this->pro_nombre,
+              'pro_descripcion' => $this->pro_descripcion,
+              'pro_fechaCreacion' => $this->pro_fechaCreacion
+
+              ));
+          }
+
           public function getPro_id() {
                     return $this->pro_id;
           }

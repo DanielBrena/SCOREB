@@ -1,5 +1,8 @@
+var actualizar;
+var administrador = {};
+
 $(document).ready(function(){
-	
+	//actualizar = false;
 	var idPagina = $("body").attr('data-page');
 	
 	switch(idPagina){
@@ -24,9 +27,13 @@ function paginaIndex(){
 
 function paginaAdministradores(){
 	console.log("Pagina de administradores");
-	var administrador = {};
+	//var administrador = {};
 	
 	var validacion = false;
+	
+	show_table_administradores();
+
+	
 
 	$(document).keypress(function(e){
 
@@ -44,7 +51,7 @@ function paginaAdministradores(){
 		});
 
 	var interval = setInterval(function(){
-		
+		administrador.id = $("#adm-id-1").val();
 		administrador.nombre = $("#adm-nombre-1").val();
 		administrador.apellidoPaterno = $("#adm-apellido_paterno-1").val();
 		administrador.apellidoMaterno = $("#adm-apellido_materno-1").val();
@@ -63,7 +70,7 @@ function paginaAdministradores(){
 
 		expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 
-		$.post("crud/crud.php",administrador_validar,function(data){
+		$.post("crud/crud_administradores.php",administrador_validar,function(data){
 				if(typeof data.mensaje != "string"){
 				validacion = true;
 				console.log("si");				
@@ -85,7 +92,7 @@ function paginaAdministradores(){
 		},'json');
 			
 		
-		if(administrador.nombre != '' && administrador.apellidoPaterno != '' && administrador.correo != '' && expr.test(administrador.correo)  && administrador.clave !='' && !validacion){
+		if( valida_administradores() /*administrador.nombre != '' && administrador.apellidoPaterno != '' && administrador.correo != '' && expr.test(administrador.correo)  && administrador.clave !=''*/ && !validacion){
 			$("#adm-enviar-1").css('display','block');
 			var administrador_recuperar = administrador;
 			administrador_recuperar = JSON.stringify(administrador_recuperar);
@@ -96,37 +103,92 @@ function paginaAdministradores(){
 
 	},1000);
 
-	$("#adm-enviar-1").click(function(){
-		if(administrador.nombre != '' && administrador.apellidoPaterno != '' && administrador.correo != '' && administrador.clave !=''){
-			console.log("Validado");
-			clearInterval(interval);
-			$.post("crud/crud.php",administrador,function(data){
-				clear_administradores();
+
+	//if( $("#adm-enviar-1").text() == "Enviar"){
+		$("#adm-enviar-1").click(function(){
+			if( valida_administradores() /*administrador.nombre != '' && administrador.apellidoPaterno != '' && administrador.correo != '' && administrador.clave !=''*/ ){
+				console.log("Validado");
+				clearInterval(interval);
+
 				
-				$("#modal-show").html(modal("Mensaje del sistema", data.mensaje));
+					console.log("Enviar");
+					$.post("crud/crud_administradores.php",administrador,function(data){
+						clear_administradores();
+						//actualizar = false;
+						$("#modal-show").html(modal("Mensaje del sistema", data.mensaje));
+						
+						$("#modal-mostrar").modal("show");
+
+					},'json').done(function(){
+						$("#aceptar").click(function(){
+							$("#modal-mostrar").modal("hide");
+							paginaAdministradores();
+						});
+					});
+
+				/*else{
+					console.log("Actualizar");
+
+					administrador.action = 'actualizar';
+
+					$.post("crud/crud.php",administrador,function(data){
+						clear_administradores();
+						actualizar = false;
+						$("#modal-show").html(modal("Mensaje del sistema", data.mensaje));
+						
+						$("#modal-mostrar").modal("show");
+
+					},'json').done(function(){
+						$("#aceptar").click(function(){
+							$("#modal-mostrar").modal("hide");
+
+							paginaAdministradores();
+						});
+					});
+				}*/
 				
-				$("#modal-mostrar").modal("show");
+					
+			}else{
+				console.log("Mal");
+			}
+		});
+	//}else{
+		//console.log("Actualizar presionado");
+	//}
+
+	
+	$(".confirm-edit").click(function(){
+			
+			//actualizar = true;
+			$("#adm-cancelar-1").css('display','block');
+			$("#adm-enviar-1").attr('class','btn btn-primary');
+			$("#adm-enviar-1").text("Actualizar");
+			$("#adm-enviar-1").attr('id','adm-actualizar-1');
+			$("#adm-actualizar-1").css("display",'block');
+
+			
+
+			var adm_id= $(this).attr('data-id');
+			console.log(adm_id);
+
+			console.log("Editar");
+			$.post("crud/crud_administradores.php",{action:'get',id:adm_id},function(data){
+				//console.log(data['adm_nombre']);
+				$("#adm-id-1").val(data['adm_id']);
+				$("#adm-nombre-1").val(data['adm_nombre']);
+				$("#adm-apellido_paterno-1").val(data['adm_apellidoPaterno']);
+				$("#adm-apellido_materno-1").val(data['adm_nombre']);
+				$("#adm-correo-1").val(data['adm_correo']);
+				$("#adm-usuario-1").val(data['adm_usuario']);
+				$("#adm-clave-1").val(data['adm_clave']);
+				$("#adm-permiso-1").val(data['adm_permiso']);
 
 			},'json').done(function(){
-				$("#aceptar").click(function(){
-					$("#modal-mostrar").modal("hide");
-					paginaAdministradores();
-				});
-			});
-			
-			
+
 				
-		}else{
-			console.log("Mal");
-		}
-	});
-	
-	$.post('crud/crud.php',{action:'mostrar'},function(data){
-		$.each(data['rows'], function(key, val) {
-        //valResp=valResp+'<li id="' + key + '">' + val + '</li>';
-        	console.log(val);
-        });
-	},'ajax');
+
+			});
+		});
 }
 
 /**
@@ -154,8 +216,16 @@ function modal(titulo, mensaje){
 	return resultado;
 }
 
+function valida_administradores(){
+	var valida = false;
+	if( $("#adm-nombre-1").val() != '' && $("#adm-apellido_paterno-1").val() != '' && $("#adm-correo-1").val() !='' && $("#adm-usuario-1").val() != '' && $("#adm-clave-1").val() != ''){
+		valida = true;
+	}
+	return valida;
+		
+}
 function clear_administradores(){
-	
+	$("#adm-id-1").val('');
 	$("#adm-nombre-1").val('');
 	$("#adm-apellido_paterno-1").val('');
 	$("#adm-apellido_materno-1").val('');
@@ -167,10 +237,66 @@ function clear_administradores(){
 function recovery_administradores(){
 	var resultado = localStorage.getItem('administrador_recovery');
 	var aux = JSON.parse(resultado);
+	$("#adm-id-1").val(aux.id);
 	$("#adm-nombre-1").val(aux.nombre);
 	$("#adm-apellido_paterno-1").val(aux.apellidoPaterno);
 	$("#adm-apellido_materno-1").val(aux.apellidoMaterno);
 	$("#adm-correo-1").val(aux.correo);
 	$("#adm-usuario-1").val(aux.usuario);
 	$("#adm-clave-1").val('');
+	$("#adm_permiso-2").val(aux.permiso);
+}
+
+function show_table_administradores(){
+	
+	$.post('crud/crud_administradores.php',{action:'mostrar'},function(data){
+		var resultado = '';
+		for(var i = 0; i < data.length; i++){
+			resultado += data[i]['adm_id'];
+			resultado += '<tr>';
+				resultado += '<td>'+data[i]['adm_permiso']+'</td>';
+			    resultado += '<td class="hidden-phone">'+data[i]['adm_nombre']+" "+data[i]['adm_apellidoPaterno']+'</td>';
+			    resultado += '<td class="hidden-phone">'+data[i]['adm_correo']+'</td>';
+			    resultado += '<td><spam class="label label-info label-mini">'+data[i]['adm_estado']+'</spam></td>';
+				resultado += '<td>';
+				resultado += '<button data-id="'+data[i]['adm_id']+'"  class="btn btn-primary btn-xs confirm-edit"><i class="icon-pencil "></i></button>';
+			 	resultado += '<button data-id="'+data[i]['adm_id']+'" class="btn btn-danger btn-xs confirm-delete"><i  class="icon-trash"></i></button>';
+			    resultado += '</td>';
+			resultado += '<tr>';
+		}
+		$("#adm-table-administradores").html(resultado);
+	},'json').done(function(){
+		
+
+
+	});
+
+	/**
+		Editar
+		*/
+		
+
+		$("#adm-actualizar-1").click(function(){
+					console.log("presionado")
+				});
+
+	$("#adm-cancelar-1").click(function(){
+				//actualizar = false;
+				$("#adm-actualizar-1").attr('id','adm-enviar-1');
+				$("#adm-cancelar-1").css('display','none');
+				$("#adm-enviar-1").attr('class','btn btn-danger');
+
+				$("#adm-enviar-1").text("Enviar");
+				//$("#adm-enviar-1").css('display','none');
+
+				clear_administradores();
+				//paginaAdministradores();
+			});
+
+			
+
+		/**
+		Eliminar
+		*/
+
 }

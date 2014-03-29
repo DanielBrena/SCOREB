@@ -6,6 +6,7 @@
  *
  * @author daniel
  */
+require_once ($_SERVER['DOCUMENT_ROOT']."/SCOREB/core/DBAbstractModel.php");
 class BecaCiclo extends DBAbstractModel{
     
     protected $bnc_id;

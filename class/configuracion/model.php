@@ -10,7 +10,8 @@
  *
  * @author daniel
  */
-require_once ("../core/DBAbstractModel.php");
+require_once ($_SERVER['DOCUMENT_ROOT']."/SCOREB/core/DBAbstractModel.php");
+
 class Configuracion extends DBAbstractModel {
           
            protected $con_id;
@@ -103,6 +104,18 @@ class Configuracion extends DBAbstractModel {
                     }else{
                               $this->mensaje = "Error";
                     }
+          }
+
+
+          public function editarID($id = '',$valor = ''){
+               if($id != '' && $valor != ''){
+                    $this->query = "UPDATE sb_configuracion SET con_valorConfiguracion = '$valor'
+                    WHERE con_id = '$id'";
+                    $this->execute_single_query();
+                    $this->mensaje = "Se ha actualizado.";
+               }else{
+                    $this->mensaje = "Error";
+               }
           }
           
           public function getCon_id() {

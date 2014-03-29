@@ -36,10 +36,10 @@ if($sesion->checarLogin()){
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="Mosaddek">
-    <meta name="keyword" content="FlatLab, Dashboard, Bootstrap, Admin, Template, Theme, Responsive, Fluid, Retina">
-    <link rel="shortcut icon" href="img/favicon.png">
+    <meta name="description" content="Sistema de Control de Becas">
+    <meta name="author" content="Daniel Brena Aquino">
+    <meta name="keyword" content="Ulsa, La Salle Oaxaca, Universidad La Salle">
+    <link rel="shortcut icon"  type="image/png" href="img/favicon.ico">
 
     <title>Acceso</title>
 
